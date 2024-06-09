@@ -1,59 +1,35 @@
 <script>
-	import Counter from './Counter.svelte';
-	import welcome from '$lib/images/svelte-welcome.webp';
-	import welcome_fallback from '$lib/images/svelte-welcome.png';
+    let stream;
+    let videoRef;
+
+    async function getStream() {
+        try {
+            stream = await navigator.mediaDevices.getUserMedia({
+                video: true,
+                audio: false
+            });
+            videoRef.srcObject = stream;
+        } catch (err) {
+            console.error(err);
+        }
+        console.log(stream.getTracks()[0]);
+    }
+
+    async function stopStream() {
+        stream.getTracks().forEach(track => track.stop());
+        videoRef.srcObject = null;
+    }
+
+    function goBack() {
+        window.location.href = "https://uatcdn.angelone.in/loans/digilockerCallback"; // Replace with your desired URL
+    }
 </script>
 
-<svelte:head>
-	<title>Home</title>
-	<meta name="description" content="Svelte demo app" />
-</svelte:head>
+<section class="container mx-auto px-4">
+    <h1 class="text-4xl text-blue-500 my-4">Webcam Stream Mastery</h1>
+    <button class="rounded-sm bg-slate-600 text-white px-4 py-2" on:click={getStream}>Start Stream</button>
+    <button class="rounded-sm bg-red-600 text-white px-4 py-2" on:click={stopStream}>Stop Stream</button>
+    <button class="rounded-sm bg-gray-600 text-white px-4 py-2" on:click={goBack}>Go Back</button>
 
-<section>
-	<h1>
-		<span class="welcome">
-			<picture>
-				<source srcset={welcome} type="image/webp" />
-				<img src={welcome_fallback} alt="Welcome" />
-			</picture>
-		</span>
-
-		to your new<br />SvelteKit app
-	</h1>
-
-	<h2>
-		try editing <strong>src/routes/+page.svelte</strong>
-	</h2>
-
-	<Counter />
+    <video class="mt-4 rounded-sm" width="640" height="480" autoplay bind:this={videoRef}></video>
 </section>
-
-<style>
-	section {
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		align-items: center;
-		flex: 0.6;
-	}
-
-	h1 {
-		width: 100%;
-	}
-
-	.welcome {
-		display: block;
-		position: relative;
-		width: 100%;
-		height: 0;
-		padding: 0 0 calc(100% * 495 / 2048) 0;
-	}
-
-	.welcome img {
-		position: absolute;
-		width: 100%;
-		height: 100%;
-		top: 0;
-		display: block;
-	}
-</style>
